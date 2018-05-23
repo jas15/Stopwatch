@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdio.h>
+#include <ctime>
 
 StopwatchViewer::StopwatchViewer(QWidget * parent)
  : QWidget(parent)
@@ -46,8 +47,14 @@ StopwatchViewer::~StopwatchViewer()
 {
     mySocket->close();
 
+    time_t now = time(0);
+    std::string dt = ctime(&now);
+    std::string filename = "../log_files/refreshRate--";
+    filename += dt;
+    filename += ".txt";
+
     std::ofstream file;
-    file.open("../log_files/refresh_rate.txt", std::fstream::out);
+    file.open(filename.c_str(), std::fstream::out);
     std::stringstream strs;
 
     //Print all of the Run refresh rates to file
