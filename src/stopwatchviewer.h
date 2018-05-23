@@ -6,6 +6,7 @@
 #include <QtNetwork/QUdpSocket>
 #include <iostream>
 #include <map>
+#include <list>
 #include <utility>
 #include <assert.h>
 
@@ -26,6 +27,7 @@ class StopwatchViewer : public QWidget
 
     private:
         static const int NUM_FIELDS = 7;
+        list<float> runTimings;
 
         Ui::StopwatchViewerClass ui;
 

@@ -1,4 +1,8 @@
 #include "stopwatchviewer.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <stdio.h>
 
 StopwatchViewer::StopwatchViewer(QWidget * parent)
  : QWidget(parent)
@@ -41,6 +45,19 @@ StopwatchViewer::StopwatchViewer(QWidget * parent)
 StopwatchViewer::~StopwatchViewer()
 {
     mySocket->close();
+
+    std::ofstream file;
+    file.open("../log_files/refresh_rate.txt", std::fstream::out);
+    std::stringstream strs;
+
+    //Print all of the Run refresh rates to file
+    for (std::list<float>::iterator it = runTimings.begin(); it != runTimings.end(); it++)
+    {
+      strs << *it << "\n";
+    }
+
+    file << strs.str();
+    file.close();
 
     delete plotHolderWidget;
 
@@ -137,6 +154,10 @@ void StopwatchViewer::updateTable()
         for(std::map<std::string, std::pair<RingBuffer<float, DEFAULT_RINGBUFFER_SIZE>, TableRow> >::const_iterator it = stopwatch.begin(); it != stopwatch.end(); it++)
         {
             TableRow & newEntry = const_cast<TableRow&>(it->second.second);
+            if (it->first == "Run")
+            {
+              runTimings.push_back(it->second.first.getReciprocal() * 1000.0);
+            }
 
             if(newEntry.isUninit())
             {
@@ -169,6 +190,7 @@ void StopwatchViewer::updateTable()
                 ui.tableWidget->item(newEntry.row, 4)->setText(QString::number(it->second.first.getAverage()));
                 ui.tableWidget->item(newEntry.row, 5)->setText(QString::number(it->second.first.getReciprocal() * 1000.0));
             }
+
 
             QCheckBox * cellCheckBox = qobject_cast<QCheckBox *>(ui.tableWidget->cellWidget(newEntry.row, 6));
 
